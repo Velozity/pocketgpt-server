@@ -33,7 +33,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   const result = await createAccount({
     email,
     password: hash,
-  });
+  }).catch((e) => e);
+  if (!result) {
+    return res.json({
+      error: "Email is taken.",
+    });
+  }
 
   if (!result.error && result.accountId) {
     res.json({
