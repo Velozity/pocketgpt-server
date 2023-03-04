@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Account {
+  id            String         @id @default(cuid())
+  displayName   String?        @db.VarChar(40)
+  email         String         @unique
+  emailVerified DateTime?
+  password      String?        @db.VarChar(255)
+  ip            String?        @db.VarChar(18)
+  lastLogin     DateTime       @default(now())
+  closed        Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
+  chatsCreated  Int            @default(0)
+  Transaction   Transaction[]
+  Subscription  Subscription[]
+  Connection    Connection[]
+  Chat          Chat[]
+
+  @@index(email)
+}
+
+model Chat {
+  id        String    @id @default(cuid())
+  title     String?
+  accountId String
+  Account   Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  Message   Message[]
+
+  @@index(accountId)
+  @@index([accountId, createdAt])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  text      String   @db.Text
+  Chat      Chat     @relation(fields: [chatId], references: [id])
+  chatId    String
+  isHuman   Boolean
+  createdAt DateTime @default(now())
+
+  @@index(chatId)
+  @@index([chatId, createdAt])
+}
+
+model Connection {
+  id                  String   @id @default(cuid())
+  accountId           String
+  account             Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  provider            String
+  providerAccountId   String
+  providerDisplayName String?
+  createdAt           DateTime @default(now())
+
+  @@unique([provider, providerAccountId])
+  @@unique([accountId, provider])
+  @@index(accountId)
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  plan      Plan     @relation(fields: [planId], references: [id])
+  planId    String
+  startDate DateTime @default(now())
+  endDate   DateTime
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+
+  Transaction Transaction[]
+
+  @@index(accountId)
+  @@index([accountId, endDate])
+  @@index([planId])
+}
+
+model Plan {
+  id           String         @id @default(cuid())
+  name         String
+  amount       Decimal        @db.Decimal(10, 2)
+  desc         String
+  interval     Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Subscription Subscription[]
+}
+
+model Transaction {
+  id             String       @id @default(cuid())
+  method         String
+  merchantId     String
+  amount         Decimal
+  accountId      String
+  account        Account      @relation(fields: [accountId], references: [id])
+  Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String
+  createdAt      DateTime     @default(now())
+
+  @@index([accountId])
+  @@index([subscriptionId])
+}
