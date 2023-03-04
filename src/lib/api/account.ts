@@ -53,9 +53,9 @@ export async function findAccount(
               select: {
                 name: true,
                 amount: true,
-              }
-            }
-          }
+              },
+            },
+          },
         },
       },
     });
@@ -108,7 +108,7 @@ export async function validateAccount(
     return {
       success: true,
       account: findUser,
-      error: !findUser.emailVerified ? "EMAIL_VERIFY" : undefined,
+      // error: !findUser.emailVerified ? "EMAIL_VERIFY" : undefined,
     };
   } catch (err) {
     return {
