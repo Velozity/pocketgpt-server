@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node server.js",
     "build": "npx prisma generate && next build",
-    "start": "node server.js",
+    "start": "npx next build && node server.js",
     "lint": "next lint"
   },
   "engines": {
