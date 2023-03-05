@@ -49,9 +49,11 @@ class OpenAIClient {
             .toString()
             .split("\n")
             .filter((line: any) => line.trim() !== "");
+
           for (const line of lines) {
             const message = line.replace(/^data: /, "");
 
+            console.log({ ok: true, message });
             if (message === "[DONE]") {
               resolve();
               return; // Stream finished
@@ -77,6 +79,7 @@ class OpenAIClient {
           resolve();
         });
       });
+
       console.timeEnd("start completion");
       if (titleEmpty) {
         // see if a title can be made,

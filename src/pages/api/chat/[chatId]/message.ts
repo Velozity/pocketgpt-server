@@ -6,15 +6,14 @@ import logger from "@/lib/logger";
 import prisma from "@/lib/prisma";
 import { validateSubscription } from "@/lib/api/subscription";
 import { applicationConfiguration } from "@/lib/config";
+import { reduceMessages } from "@/utils/tokens";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   let account;
   try {
-    console.time("jwt auth");
     account = await JWTAuthenticator.validate(
       req.headers?.authorization?.split("Bearer ")[1] || ""
     );
-    console.timeEnd("jwt auth");
   } catch {
     return res.status(501).end();
   }
@@ -78,14 +77,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           "Content-Encoding": "none",
         });
         const textResponse = await OpenAIClient.completeChatPrompt(
-          message.chatMessages.map((m) => {
-            return { role: m.isHuman ? "user" : "assistant", content: m.text };
-          }),
+          reduceMessages(
+            message.chatMessages.map((m) => {
+              return {
+                role: m.isHuman ? "user" : "assistant",
+                content: m.text,
+              };
+            })
+          ),
           {
             titleEmpty: message.titleEmpty,
             onPartialResponse: (text: string) => {
-              console.log(text);
-              res.write(`{"type": "partial", "text": "${text}"}\n\n`);
+              res.write(
+                `{"type": "partial", "text": "${text
+                  .replace(/\n/g, "\\n")
+                  .replace(/"/g, '\\"')}"}\n\n`
+              );
             },
           }
         );
