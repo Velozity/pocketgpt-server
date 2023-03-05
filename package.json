@@ -12,6 +12,7 @@
     "node": "14.17.3"
   },
   "dependencies": {
+    "@fortaine/fetch-event-source": "^3.0.6",
     "@next/font": "13.1.6",
     "@prisma/client": "^4.11.0",
     "@types/jsonwebtoken": "^9.0.1",

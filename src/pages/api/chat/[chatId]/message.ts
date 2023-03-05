@@ -109,12 +109,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
           });
         }
-        await createMessage(textResponse.text as string, chatId as string);
-        console.timeEnd("After prompt");
         res.write(
           JSON.stringify({ ...textResponse, type: "complete" }) + "\n\n"
         );
-        return res.end();
+        res.end();
+        await createMessage(textResponse.text as string, chatId as string);
+        console.timeEnd("After prompt");
+        return;
       } catch (err) {
         console.log(err);
         return res.status(500).end();

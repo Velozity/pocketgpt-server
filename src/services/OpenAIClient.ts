@@ -1,6 +1,7 @@
 import logger from "@/lib/logger";
 import _ from "lodash";
 import { Configuration, OpenAIApi } from "openai";
+import * as parse from "@fortaine/fetch-event-source/parse";
 
 class OpenAIClient {
   private apiKey: string;
@@ -44,36 +45,30 @@ class OpenAIClient {
 
       let fullResponse = "";
       await new Promise<void>((resolve, reject) => {
-        res.data.on("data", (data: any) => {
-          const lines = data
-            .toString()
-            .split("\n")
-            .filter((line: any) => line.trim() !== "");
+        res.data.on(
+          "data",
+          parse.getLines(
+            parse.getMessages((event) => {
+              if (event.data === "[DONE]") {
+                resolve();
+                return;
+              }
 
-          for (const line of lines) {
-            const message = line.replace(/^data: /, "");
+              try {
+                const parsed = JSON.parse(event.data);
+                if (!parsed.choices[0].delta.content) return;
 
-            if (message === "[DONE]") {
-              resolve();
-              return; // Stream finished
-            }
-            try {
-              const parsed = JSON.parse(message);
-              if (!parsed.choices[0].delta.content) return;
-
-              fullResponse += parsed.choices[0].delta.content;
-              onPartialResponse(parsed.choices[0].delta.content);
-            } catch (error) {
-              console.error(
-                "Could not JSON parse stream message",
-                message,
-                error
-              );
-            }
-          }
-        });
+                fullResponse += parsed.choices[0].delta.content;
+                onPartialResponse(parsed.choices[0].delta.content);
+              } catch (error) {
+                console.error("Could not JSON parse stream message", error);
+              }
+            })
+          )
+        );
 
         res.data.on("end", () => {
+          console.log("end");
           resolve();
         });
       });
