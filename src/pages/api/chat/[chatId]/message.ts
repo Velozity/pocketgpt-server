@@ -8,31 +8,33 @@ import { validateSubscription } from "@/lib/api/subscription";
 import { applicationConfiguration } from "@/lib/config";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  let account;
-  try {
-    console.time("jwt auth");
-    account = await JWTAuthenticator.validate(
-      req.headers?.authorization?.split("Bearer ")[1] || ""
-    );
-    console.timeEnd("jwt auth");
-  } catch {
-    return res.status(501).end();
-  }
+  let account = {
+    id: "cleubyj4i0000n1o16z68hjd1",
+  };
+  // try {
+  //   console.time("jwt auth");
+  //   account = await JWTAuthenticator.validate(
+  //     req.headers?.authorization?.split("Bearer ")[1] || ""
+  //   );
+  //   console.timeEnd("jwt auth");
+  // } catch {
+  //   return res.status(501).end();
+  // }
 
-  if (!account) {
-    return res.status(501).end();
-  }
+  // if (!account) {
+  //   return res.status(501).end();
+  // }
 
   const { method } = req;
   const { chatId } = req.query;
   switch (method) {
-    case "POST":
-      const text = req.body.text as string;
+    case "GET":
+      const text = req.query.text as string;
       if (!chatId || !text) return res.status(400).end();
 
       try {
         console.time("Checks");
-        const subscription = await validateSubscription(account.id);
+        const subscription = await validateSubscription(account.id); // account.id
         if (!subscription.success) {
           console.timeEnd("Checks");
           return res.json({
@@ -68,12 +70,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
         console.time("Create prompt");
 
+        res.writeHead(200, {
+          "Transfer-Encoding": "chunked",
+
+          "Content-Type": "text/event-stream",
+
+          Connection: "keep-alive",
+          "Cache-Control": "no-cache",
+          "Content-Encoding": "none",
+        });
         const textResponse = await OpenAIClient.completeChatPrompt(
           message.chatMessages.map((m) => {
             return { role: m.isHuman ? "user" : "assistant", content: m.text };
           }),
           {
             titleEmpty: message.titleEmpty,
+            onPartialResponse: (text: string) => {
+              console.log(text);
+              res.write(`data: {"type": "partial", "text": "${text}"}\n\n`);
+            },
           }
         );
         console.timeEnd("Create prompt");
@@ -91,7 +106,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
         await createMessage(textResponse.text as string, chatId as string);
         console.timeEnd("After prompt");
-        return res.json(textResponse);
+        res.write(
+          "data: " + JSON.stringify({ ...textResponse, type: "complete" })
+        );
+        return res.end();
       } catch (err) {
         console.log(err);
         return res.status(500).end();

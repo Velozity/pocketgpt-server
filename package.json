@@ -27,12 +27,13 @@
     "jsonwebtoken": "^9.0.0",
     "next": "13.1.6",
     "openai": "^3.2.1",
+    "openai-streams": "^4.1.0",
     "pino": "^8.10.0",
     "pino-pretty": "^9.2.0",
+    "prisma": "^4.11.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.9.5",
-        "prisma": "^4.11.0"
+    "typescript": "4.9.5"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.1",
