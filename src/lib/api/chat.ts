@@ -30,18 +30,34 @@ export async function createChat(accountId: string): Promise<{
   }
 }
 
-export async function findChat(id: string): Promise<any> {
+export async function findChat(
+  id: string,
+  page: number = 1,
+  pageSize: number
+): Promise<any> {
   try {
-    const findChats = await prisma.chat.findUnique({
+    let findChats: any = await prisma.chat.findUnique({
       where: {
         id,
       },
       include: {
         Message: {
-          orderBy: { createdAt: "asc" },
+          orderBy: { createdAt: "desc" },
+          skip: pageSize * (page - 1),
+          take: pageSize,
         },
       },
     });
+
+    const count = await prisma.message.count({
+      where: {
+        chatId: id,
+      },
+    });
+
+    if (Math.ceil(count / pageSize) === page) {
+      findChats.Message.push({ type: "convoStart" });
+    }
 
     return findChats || undefined;
   } catch (err) {

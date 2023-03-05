@@ -17,10 +17,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const { method } = req;
-  const { chatId } = req.query;
+  const { chatId, page } = req.query;
   switch (method) {
     case "GET":
-      return res.json(await findChat(chatId as string));
+      return res.json(await findChat(chatId as string, Number(page) || 1, 20));
     default:
       res.setHeader("Allow", ["GET"]);
       res.status(405).end(`Method ${method} Not Allowed`);
