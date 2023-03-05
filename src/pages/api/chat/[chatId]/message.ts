@@ -8,28 +8,26 @@ import { validateSubscription } from "@/lib/api/subscription";
 import { applicationConfiguration } from "@/lib/config";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  let account = {
-    id: "cleubyj4i0000n1o16z68hjd1",
-  };
-  // try {
-  //   console.time("jwt auth");
-  //   account = await JWTAuthenticator.validate(
-  //     req.headers?.authorization?.split("Bearer ")[1] || ""
-  //   );
-  //   console.timeEnd("jwt auth");
-  // } catch {
-  //   return res.status(501).end();
-  // }
+  let account;
+  try {
+    console.time("jwt auth");
+    account = await JWTAuthenticator.validate(
+      req.headers?.authorization?.split("Bearer ")[1] || ""
+    );
+    console.timeEnd("jwt auth");
+  } catch {
+    return res.status(501).end();
+  }
 
-  // if (!account) {
-  //   return res.status(501).end();
-  // }
+  if (!account) {
+    return res.status(501).end();
+  }
 
   const { method } = req;
   const { chatId } = req.query;
   switch (method) {
-    case "GET":
-      const text = req.query.text as string;
+    case "POST":
+      const text = req.body.text as string;
       if (!chatId || !text) return res.status(400).end();
 
       try {
