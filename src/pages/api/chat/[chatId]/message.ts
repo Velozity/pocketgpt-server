@@ -104,7 +104,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
         await createMessage(textResponse.text as string, chatId as string);
         console.timeEnd("After prompt");
-        res.write(JSON.stringify({ ...textResponse, type: "complete" }));
+        res.write(
+          JSON.stringify({ ...textResponse, type: "complete" }) + "\n\n"
+        );
         return res.end();
       } catch (err) {
         console.log(err);
