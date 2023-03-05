@@ -15,7 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   res.write("data: 1\n\n");
 
   let count = 2;
-  setTimeout(() => {
+  setInterval(() => {
     res.write(`data: ${count++}\n\n`);
   }, 1000);
 };
