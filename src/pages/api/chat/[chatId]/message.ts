@@ -85,7 +85,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             titleEmpty: message.titleEmpty,
             onPartialResponse: (text: string) => {
               console.log(text);
-              res.write(`data: {"type": "partial", "text": "${text}"}\n\n`);
+              res.write(`{"type": "partial", "text": "${text}"}\n\n`);
             },
           }
         );
@@ -104,9 +104,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
         await createMessage(textResponse.text as string, chatId as string);
         console.timeEnd("After prompt");
-        res.write(
-          "data: " + JSON.stringify({ ...textResponse, type: "complete" })
-        );
+        res.write(JSON.stringify({ ...textResponse, type: "complete" }));
         return res.end();
       } catch (err) {
         console.log(err);
