@@ -53,7 +53,6 @@ class OpenAIClient {
           for (const line of lines) {
             const message = line.replace(/^data: /, "");
 
-            console.log({ ok: true, message });
             if (message === "[DONE]") {
               resolve();
               return; // Stream finished
@@ -75,7 +74,6 @@ class OpenAIClient {
         });
 
         res.data.on("end", () => {
-          console.log("end");
           resolve();
         });
       });
