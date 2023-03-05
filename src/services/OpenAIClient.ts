@@ -2,6 +2,7 @@ import logger from "@/lib/logger";
 import _ from "lodash";
 import { Configuration, OpenAIApi } from "openai";
 import * as parse from "@fortaine/fetch-event-source/parse";
+import { openAIConfiguration } from "@/lib/config";
 
 class OpenAIClient {
   private apiKey: string;
@@ -17,6 +18,7 @@ class OpenAIClient {
 
   public async completeChatPrompt(
     messages: { content: string; role: "system" | "user" | "assistant" }[],
+    tokensUsed: number,
     {
       titleEmpty,
       onPartialResponse,
@@ -32,7 +34,6 @@ class OpenAIClient {
   }> {
     try {
       // generation
-
       console.time("start completion");
       const res: any = await this.openai.createChatCompletion(
         {

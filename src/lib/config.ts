@@ -4,3 +4,7 @@ export const applicationConfiguration = {
     maxPromptsPerChat: 20,
   },
 };
+
+export const openAIConfiguration = {
+  maxTokens: 4000,
+};

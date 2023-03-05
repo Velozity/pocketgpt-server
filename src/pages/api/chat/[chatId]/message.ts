@@ -76,15 +76,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           "Cache-Control": "no-cache",
           "Content-Encoding": "none",
         });
+
+        const { messages, usedTokens } = reduceMessages(
+          message.chatMessages.map((m) => {
+            return {
+              role: m.isHuman ? "user" : "assistant",
+              content: m.text,
+            };
+          })
+        );
+
         const textResponse = await OpenAIClient.completeChatPrompt(
-          reduceMessages(
-            message.chatMessages.map((m) => {
-              return {
-                role: m.isHuman ? "user" : "assistant",
-                content: m.text,
-              };
-            })
-          ),
+          messages,
+          usedTokens,
           {
             titleEmpty: message.titleEmpty,
             onPartialResponse: (text: string) => {

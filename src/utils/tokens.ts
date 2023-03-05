@@ -1,7 +1,8 @@
+import { openAIConfiguration } from "@/lib/config";
 import { encode } from "gpt-3-encoder";
 
 export const reduceMessages = (messages: any) => {
-  const MAX_TOKENS = 2000;
+  const MAX_TOKENS = 3000;
 
   let tokenCount = 0;
   let reducedMessages = [];
@@ -18,6 +19,5 @@ export const reduceMessages = (messages: any) => {
     reducedMessages.unshift(message);
   }
 
-  console.log(`Tokens: ${tokenCount}`);
-  return reducedMessages;
+  return { messages: reducedMessages, usedTokens: tokenCount };
 };
