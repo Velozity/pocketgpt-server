@@ -75,6 +75,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           Connection: "keep-alive",
           "Cache-Control": "no-cache",
           "Content-Encoding": "none",
+          "X-Accel-Buffering": "no",
         });
 
         const { messages, usedTokens } = reduceMessages(
