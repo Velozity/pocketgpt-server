@@ -107,7 +107,7 @@ export async function deleteChats(
       .deleteMany({
         where: {
           OR: chatIds.map((c) => {
-            return { chatId: c, accountId };
+            return { chatId: c, Chat: { accountId } };
           }),
         },
       })
