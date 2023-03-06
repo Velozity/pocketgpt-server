@@ -36,7 +36,7 @@ export async function findChat(
   pageSize: number
 ): Promise<any> {
   try {
-    let findChats: any = await prisma.chat.findUnique({
+    let findChat: any = await prisma.chat.findUnique({
       where: {
         id,
       },
@@ -55,11 +55,14 @@ export async function findChat(
       },
     });
 
-    if (Math.ceil(count / pageSize) === page) {
-      findChats.Message.push({ type: "convoStart" });
+    if (findChat && (count === 0 || Math.ceil(count / pageSize) === page)) {
+      findChat.Message.push({
+        type: "convoStart",
+        createdAt: findChat.createdAt,
+      });
     }
 
-    return findChats || undefined;
+    return findChat || undefined;
   } catch (err) {
     logger.error(err);
   }
@@ -100,15 +103,27 @@ export async function deleteChats(
   chatIds: string[]
 ): Promise<number> {
   try {
-    const del = await prisma.chat.deleteMany({
-      where: {
-        OR: chatIds.map((c) => {
-          return { id: c, accountId };
-        }),
-      },
-    });
+    await prisma.message
+      .deleteMany({
+        where: {
+          OR: chatIds.map((c) => {
+            return { chatId: c, accountId };
+          }),
+        },
+      })
+      .catch((e) => e);
 
-    return del.count;
+    const del = await prisma.chat
+      .deleteMany({
+        where: {
+          OR: chatIds.map((c) => {
+            return { id: c, accountId };
+          }),
+        },
+      })
+      .catch((e) => e);
+
+    return !del ? 0 : del.count;
   } catch (err) {
     logger.error(err);
     return 0;

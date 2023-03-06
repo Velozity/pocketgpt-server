@@ -23,6 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.json(await findAccountChats(account.id));
     case "DELETE":
       let { chatIds } = req.query;
+
       if (!chatIds) return res.status(401).end();
       try {
         chatIds = JSON.parse(chatIds as string);
