@@ -38,11 +38,9 @@ export async function findAccount(
       },
       select: {
         id: true,
-        displayName: true,
         email: true,
         emailVerified: true,
         createdAt: true,
-        lastLogin: true,
         Subscription: {
           where: {
             endDate: { gte: new Date() },
