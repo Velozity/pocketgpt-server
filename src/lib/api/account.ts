@@ -21,10 +21,15 @@ export async function createAccount(
       success: true,
       accountId: account.id,
     };
-  } catch (err) {
-    logger.error(err);
+  } catch (err: any) {
+    if (err.code === "P2002") {
+      return {
+        error: "Email is taken.",
+      };
+    }
+
     return {
-      error: "An unknown error occurred.",
+      error: "An unexpected error occurred.",
     };
   }
 }
