@@ -19,7 +19,7 @@ export default async function handler(
       decodedData;
     const { purchaseToken, subscriptionId, notificationType } =
       subscriptionNotification;
-    console.log(decodedData);
+
     if (notificationType === 4) {
       const validate = await verifySubscription(
         packageName,
@@ -71,24 +71,28 @@ export default async function handler(
       }
     } else if (notificationType === 13) {
       // EXPIRED SUBSCRIPTION
-      await prisma.subscription.update({
-        where: {
-          externalOrderId: purchaseToken,
-        },
-        data: {
-          status: "expired",
-        },
-      });
+      await prisma.subscription
+        .update({
+          where: {
+            externalOrderId: purchaseToken,
+          },
+          data: {
+            status: "expired",
+          },
+        })
+        .catch((e) => e);
     } else if (notificationType === 3) {
       // CANCELLED SUBSCRIPTION
-      await prisma.subscription.update({
-        where: {
-          externalOrderId: purchaseToken,
-        },
-        data: {
-          status: "cancelled",
-        },
-      });
+      await prisma.subscription
+        .update({
+          where: {
+            externalOrderId: purchaseToken,
+          },
+          data: {
+            status: "cancelled",
+          },
+        })
+        .catch((e) => e);
     } else if (notificationType === 6) {
       // GRACE PERIOD ENTERED
       await prisma.subscription.update({
@@ -101,25 +105,29 @@ export default async function handler(
       });
     } else if (notificationType === 7) {
       // SUBSCRIPTION RESTORED
-      await prisma.subscription.update({
-        where: {
-          externalOrderId: purchaseToken,
-        },
-        data: {
-          status: "active",
-        },
-      });
+      await prisma.subscription
+        .update({
+          where: {
+            externalOrderId: purchaseToken,
+          },
+          data: {
+            status: "active",
+          },
+        })
+        .catch((e) => e);
     } else if (notificationType === 12) {
       // REVOKED FROM USER
-      await prisma.subscription.update({
-        where: {
-          externalOrderId: purchaseToken,
-        },
-        data: {
-          endDate: new Date(),
-          status: "revoked",
-        },
-      });
+      await prisma.subscription
+        .update({
+          where: {
+            externalOrderId: purchaseToken,
+          },
+          data: {
+            endDate: new Date(),
+            status: "revoked",
+          },
+        })
+        .catch((e) => e);
     } else if (notificationType === 2) {
       // RENEWED
       const validate = await verifySubscription(
@@ -147,24 +155,26 @@ export default async function handler(
         lineItems,
       } = payload;
       const { obfuscatedExternalAccountId } = externalAccountIdentifiers;
-      await prisma.subscription.update({
-        where: {
-          externalOrderId: purchaseToken,
-        },
-        data: {
-          endDate: new Date(lineItems[0].expiryTime),
-          status: "active",
-          Transaction: {
-            create: {
-              accountId: obfuscatedExternalAccountId,
-              method: "androidSubscription",
-              merchantOrderId: latestOrderId,
-              amount: 7.99,
-              amountCurrencyCode: priceCurrencyCode,
+      await prisma.subscription
+        .update({
+          where: {
+            externalOrderId: purchaseToken,
+          },
+          data: {
+            endDate: new Date(lineItems[0].expiryTime),
+            status: "active",
+            Transaction: {
+              create: {
+                accountId: obfuscatedExternalAccountId,
+                method: "androidSubscription",
+                merchantOrderId: latestOrderId,
+                amount: 7.99,
+                amountCurrencyCode: priceCurrencyCode,
+              },
             },
           },
-        },
-      });
+        })
+        .catch((e) => e);
 
       logger.info("Subscription renewed for " + obfuscatedExternalAccountId);
     }
