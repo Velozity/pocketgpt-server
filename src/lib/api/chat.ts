@@ -18,6 +18,18 @@ export async function createChat(accountId: string): Promise<{
         title: true,
       },
     });
+
+    if (chat) {
+      prisma.account.update({
+        where: {
+          id: accountId,
+        },
+        data: {
+          chatsCreated: { increment: 1 },
+        },
+      });
+    }
+
     return {
       success: true,
       chat,
