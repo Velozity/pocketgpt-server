@@ -14,7 +14,8 @@ export default async function handler(
     );
     const { packageName, eventTimeMillis, subscriptionNotification } =
       decodedData;
-    const { purchaseToken, subscriptionId } = subscriptionNotification;
+    const { purchaseToken, subscriptionId, notificationType } =
+      subscriptionNotification;
 
     console.log(decodedData);
     console.log(subscription);
@@ -24,6 +25,10 @@ export default async function handler(
       purchaseToken,
       subscriptionId,
     });
+
+    if (notificationType !== 4) {
+      return res.status(200).end();
+    }
 
     await verifySubscription(packageName, subscriptionId, purchaseToken);
     res.status(200).end();

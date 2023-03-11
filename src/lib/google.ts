@@ -10,6 +10,10 @@ export async function verifySubscription(
   productId: string,
   purchaseToken: string
 ) {
+  console.log({
+    email: process.env.GOOGLE_SERVICE_EMAIL || "",
+    key: process.env.GOOGLE_SERVICE_KEY || "",
+  });
   return verifier
     .verifySub({
       packageName,
