@@ -64,6 +64,7 @@ export default async function handler(
       );
 
       if (success) {
+        console.log("COMPLETED FULLY!");
       } else {
         logger.error("FAILED TO CREATE SUBSCRIPTION BUT ITS VALID.");
         logger.error(payload);
