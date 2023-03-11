@@ -52,12 +52,6 @@ export async function findAccount(
           },
           select: {
             id: true,
-            plan: {
-              select: {
-                name: true,
-                amount: true,
-              },
-            },
           },
         },
       },

@@ -13,12 +13,17 @@ export async function verifySubscription(
   purchaseToken: string
 ) {
   return verifier
-    .verifySub({
-      packageName,
-      productId,
-      purchaseToken,
-    })
+    .verifySub(
+      {
+        packageName,
+        productId,
+        purchaseToken,
+      },
+      true
+    )
     .then((response) => {
+      console.log("full response:");
+      console.log(response);
       return response;
     })
     .catch((e) => {

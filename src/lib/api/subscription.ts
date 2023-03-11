@@ -30,25 +30,40 @@ export async function validateSubscription(accountId: string): Promise<{
 
 export async function createSubscription(
   accountId: string,
-  planId: string
+  method: string,
+  externalOrderId: string,
+  merchantOrderId: string,
+  subscriptionId: string,
+  amount: number,
+  amountCurrencyCode: string,
+  startTimeMillis: number,
+  endDateMillis: number
 ): Promise<{
   success: boolean;
   isSubscribed?: boolean;
   chatsCreated?: number;
 }> {
   try {
-    const sub = await prisma.subscription.findFirst({
-      where: {
+    const sub = await prisma.subscription.create({
+      data: {
         accountId: accountId,
-        endDate: { gte: new Date() },
-      },
-      select: {
-        id: true,
+        startDate: new Date(startTimeMillis),
+        endDate: new Date(endDateMillis),
+        externalOrderId,
+        subscriptionId,
+        Transaction: {
+          create: {
+            accountId,
+            method,
+            merchantOrderId,
+            amount,
+            amountCurrencyCode,
+          },
+        },
       },
     });
     return {
-      success: true,
-      isSubscribed: sub?.id ? true : false,
+      success: sub.id ? true : false,
     };
   } catch (err) {
     logger.error(err);
