@@ -3,7 +3,7 @@ import Verifier from "google-play-billing-validator";
 const verifier = new Verifier({
   email: process.env.GOOGLE_SERVICE_EMAIL || "",
   key: Buffer.from(process.env.GOOGLE_SERVICE_KEY || "", "base64").toString(
-    "utf-8"
+    "ascii"
   ),
 });
 
@@ -15,7 +15,7 @@ export async function verifySubscription(
   console.log({
     email: process.env.GOOGLE_SERVICE_EMAIL || "",
     key: Buffer.from(process.env.GOOGLE_SERVICE_KEY || "", "base64").toString(
-      "utf-8"
+      "ascii"
     ),
   });
   return verifier
