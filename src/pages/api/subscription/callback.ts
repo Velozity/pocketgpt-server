@@ -16,6 +16,7 @@ export default async function handler(
       decodedData;
     const { purchaseToken, subscriptionId } = subscriptionNotification;
 
+    console.log(decodedData);
     console.log(subscription);
     console.log({
       packageName,
