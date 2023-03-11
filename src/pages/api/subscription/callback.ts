@@ -24,6 +24,8 @@ export default async function handler(
         subscriptionId,
         purchaseToken
       ).catch((e) => e);
+      console.log("validate obj:");
+      console.log(validate);
       if (!validate) {
         logger.error(validate);
         return res.status(200).end();
