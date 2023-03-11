@@ -141,7 +141,6 @@ export default async function handler(
 
       const {
         latestOrderId,
-        expiryTimeMillis,
         priceCurrencyCode,
         externalAccountIdentifiers,
         lineItems,
