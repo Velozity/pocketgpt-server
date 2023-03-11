@@ -7,6 +7,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   console.log(subscription);
   console.log(message.messageId);
-  console.log(data);
+  console.log(Buffer.from(data, "base64").toString("utf-8"));
   res.status(200).end();
 }
