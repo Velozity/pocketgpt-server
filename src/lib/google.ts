@@ -25,9 +25,6 @@ export async function verifySubscription(
       purchaseToken,
     })
     .then((response) => {
-      // subscription is valid
-      console.log("subscription is valid, response:");
-      console.log(response);
       return response;
     })
     .catch((e) => {

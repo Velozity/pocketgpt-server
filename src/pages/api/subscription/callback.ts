@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { verifySubscription } from "@/lib/google";
+import logger from "@/lib/logger";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -17,20 +18,48 @@ export default async function handler(
     const { purchaseToken, subscriptionId, notificationType } =
       subscriptionNotification;
 
-    console.log(decodedData);
-    console.log(subscription);
-    console.log({
-      packageName,
-      eventTimeMillis,
-      purchaseToken,
-      subscriptionId,
-    });
+    if (notificationType === 4) {
+      const validate = await verifySubscription(
+        packageName,
+        subscriptionId,
+        purchaseToken
+      ).catch((e) => e);
+      if (!validate) {
+        logger.error(validate);
+        return res.status(200).end();
+      }
 
-    if (notificationType !== 4) {
-      return res.status(200).end();
+      const { isSuccessful, errorMessage, payload } = validate;
+      if (!isSuccessful) {
+        logger.error(validate);
+        return res.status(200).end();
+      }
+
+      const {
+        orderId,
+        startTimeMillis,
+        expiryTimeMillis,
+        autoRenewing,
+        priceCurrencyCode,
+        priceAmountMicros,
+        developerPayload,
+      } = payload;
+
+      console.log({
+        purchaseToken,
+        priceAmountMicros,
+        subscriptionId,
+        orderId,
+        startTimeMillis,
+        expiryTimeMillis,
+        autoRenewing,
+        priceCurrencyCode,
+        developerPayload,
+      });
+    } else if (notificationType === 13) {
+      // EXPIRED SUBSCRIPTION
     }
 
-    await verifySubscription(packageName, subscriptionId, purchaseToken);
     res.status(200).end();
   } catch (err) {
     console.log("bad req:");
