@@ -40,26 +40,27 @@ export default async function handler(
       }
 
       const {
-        orderId,
-        startTimeMillis,
-        expiryTimeMillis,
+        latestOrderId,
+        startTime,
+
         autoRenewing,
-        priceCurrencyCode,
-        priceAmountMicros,
+        regionCode,
         developerPayload,
-        obfuscatedExternalAccountId,
+        externalAccountIdentifiers,
+        lineItems,
       } = payload;
+      const { obfuscatedExternalAccountId } = externalAccountIdentifiers;
 
       const { success } = await createSubscription(
         obfuscatedExternalAccountId,
         "androidSubscription",
         purchaseToken,
-        orderId,
+        latestOrderId,
         subscriptionId,
-        Number(priceAmountMicros) / 1000000,
-        priceCurrencyCode,
-        startTimeMillis,
-        expiryTimeMillis
+        7.99,
+        regionCode,
+        startTime,
+        lineItems[0].expiryTime
       );
 
       if (success) {
@@ -139,26 +140,26 @@ export default async function handler(
       }
 
       const {
-        orderId,
+        latestOrderId,
         expiryTimeMillis,
         priceCurrencyCode,
-        priceAmountMicros,
-        obfuscatedExternalAccountId,
+        externalAccountIdentifiers,
+        lineItems,
       } = payload;
-
+      const { obfuscatedExternalAccountId } = externalAccountIdentifiers;
       await prisma.subscription.update({
         where: {
           externalOrderId: purchaseToken,
         },
         data: {
-          endDate: expiryTimeMillis,
-          status: "revoked",
+          endDate: new Date(lineItems[0].expiryTime),
+          status: "active",
           Transaction: {
             create: {
               accountId: obfuscatedExternalAccountId,
               method: "androidSubscription",
-              merchantOrderId: orderId,
-              amount: Number(priceAmountMicros / 1000000),
+              merchantOrderId: latestOrderId,
+              amount: 7.99,
               amountCurrencyCode: priceCurrencyCode,
             },
           },

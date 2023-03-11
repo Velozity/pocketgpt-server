@@ -36,8 +36,8 @@ export async function createSubscription(
   subscriptionId: string,
   amount: number,
   amountCurrencyCode: string,
-  startTimeMillis: number,
-  endDateMillis: number
+  startTimeMillis: any,
+  endDateMillis: any
 ): Promise<{
   success: boolean;
   isSubscribed?: boolean;
