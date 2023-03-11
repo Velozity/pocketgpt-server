@@ -153,30 +153,44 @@ export default async function handler(
         priceCurrencyCode,
         externalAccountIdentifiers,
         lineItems,
+        subscriptionState,
       } = payload;
       const { obfuscatedExternalAccountId } = externalAccountIdentifiers;
-      await prisma.subscription
-        .update({
-          where: {
-            externalOrderId: purchaseToken,
-          },
-          data: {
-            endDate: new Date(lineItems[0].expiryTime),
-            status: "active",
-            Transaction: {
-              create: {
-                accountId: obfuscatedExternalAccountId,
-                method: "androidSubscription",
-                merchantOrderId: latestOrderId,
-                amount: 7.99,
-                amountCurrencyCode: priceCurrencyCode,
+      if (subscriptionState === "SUBSCRIPTION_STATE_EXPIRED") {
+        await prisma.subscription
+          .update({
+            where: {
+              externalOrderId: purchaseToken,
+            },
+            data: {
+              status: "expired",
+            },
+          })
+          .catch((e) => e);
+      } else {
+        await prisma.subscription
+          .update({
+            where: {
+              externalOrderId: purchaseToken,
+            },
+            data: {
+              endDate: new Date(lineItems[0].expiryTime),
+              status: "active",
+              Transaction: {
+                create: {
+                  accountId: obfuscatedExternalAccountId,
+                  method: "androidSubscription",
+                  merchantOrderId: latestOrderId,
+                  amount: 7.99,
+                  amountCurrencyCode: priceCurrencyCode,
+                },
               },
             },
-          },
-        })
-        .catch((e) => e);
+          })
+          .catch((e) => e);
 
-      logger.info("Subscription renewed for " + obfuscatedExternalAccountId);
+        logger.info("Subscription renewed for " + obfuscatedExternalAccountId);
+      }
     }
 
     res.status(200).end();
