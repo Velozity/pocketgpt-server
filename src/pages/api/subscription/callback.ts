@@ -2,10 +2,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log(req);
+  const { message, subscription } = req.body;
+  const { data } = message;
 
-  console.log("query/body:");
-  console.log(req.query);
-  console.log(req.body);
-  res.status(200).json({ name: "John Doe" });
+  console.log(subscription);
+  console.log(message.messageId);
+  console.log(data);
+  res.status(200).end();
 }
