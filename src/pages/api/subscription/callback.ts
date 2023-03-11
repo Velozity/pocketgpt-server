@@ -17,7 +17,7 @@ export default async function handler(
       decodedData;
     const { purchaseToken, subscriptionId, notificationType } =
       subscriptionNotification;
-
+    console.log(decodedData);
     if (notificationType === 4) {
       const validate = await verifySubscription(
         packageName,

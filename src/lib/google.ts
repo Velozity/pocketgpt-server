@@ -12,12 +12,6 @@ export async function verifySubscription(
   productId: string,
   purchaseToken: string
 ) {
-  console.log({
-    email: process.env.GOOGLE_SERVICE_EMAIL || "",
-    key: Buffer.from(process.env.GOOGLE_SERVICE_KEY || "", "base64")
-      .toString("ascii")
-      .replace(/\\n/g, "\n"),
-  });
   return verifier
     .verifySub({
       packageName,
