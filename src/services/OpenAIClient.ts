@@ -45,6 +45,7 @@ class OpenAIClient {
       );
 
       let fullResponse = "";
+      let count = 0;
       await new Promise<void>((resolve, reject) => {
         res.data.on(
           "data",
@@ -60,7 +61,7 @@ class OpenAIClient {
                 if (!parsed.choices[0].delta.content) return;
 
                 fullResponse += parsed.choices[0].delta.content;
-                onPartialResponse(parsed.choices[0].delta.content);
+                onPartialResponse(parsed.choices[0].delta.content, count++);
               } catch (error) {
                 console.error("Could not JSON parse stream message", error);
               }

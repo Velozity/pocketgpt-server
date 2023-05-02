@@ -92,9 +92,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           usedTokens,
           {
             titleEmpty: message.titleEmpty,
-            onPartialResponse: (text: string) => {
+            onPartialResponse: (text: string, index: number) => {
+              console.log(`writing partial: ${text}`);
               res.write(
-                `{"type": "partial", "text": "${text
+                `{"type": "partial", "index": ${index}, "text": "${text
                   .replace(/\n/g, "\\n")
                   .replace(/"/g, '\\"')}"}\n\n`
               );

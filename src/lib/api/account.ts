@@ -108,6 +108,7 @@ export async function validateAccount(
       // error: !findUser.emailVerified ? "EMAIL_VERIFY" : undefined,
     };
   } catch (err) {
+    console.log(err);
     return {
       error: "Something went wrong, please try again soon.",
     };
